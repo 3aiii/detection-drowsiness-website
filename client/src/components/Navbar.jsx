@@ -10,7 +10,14 @@ const Navbar = () => {
           </h1>
         </div>
         <div className="flex items-center gap-4 text-gray-700 font-medium">
-          <p>Sirapat Wongphatsawek</p>
+          <div className="flex items-center gap-2 bg-[#f0f9ff] p-2 rounded-lg shadow-sm">
+            <p className="text-gray-700 text-lg font-semibold">
+              ยินดีต้อนรับ ,
+            </p>
+            <span className="text-[#1296BF] text-lg font-bold">
+              Sirapat Wongphatsawek
+            </span>
+          </div>
           <img
             src="https://placehold.co/50x50"
             className="rounded-full w-[50px] h-[50px]"

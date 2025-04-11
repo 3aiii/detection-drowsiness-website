@@ -93,14 +93,14 @@ const Profile = () => {
       <div className="flex justify-end gap-2">
         <button
           className="w-fit px-4 bg-gray-400 hover:bg-gray-500 transition
-             text-white rounded-lg py-2 mt-4 text-สเ"
+             text-white rounded-lg py-2 mt-4 text-lg"
         >
           ยกเลิก
         </button>
         <button
           type="submit"
           className="w-fit px-4 bg-[#1296BF] hover:bg-[#377c91] transition
-             text-white rounded-lg py-2 mt-4 text-สเ"
+             text-white rounded-lg py-2 mt-4 text-lg"
         >
           แก้ไขข้อมูล
         </button>
