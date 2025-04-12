@@ -1,6 +1,43 @@
 import React from "react";
+import { logout } from "../apis/authApi";
+import { useNavigate } from "react-router-dom";
+import { showAlert } from "../utils/sweetProp";
+import Swal from "sweetalert2";
+import { PROFILE_URL } from "../confidential";
 
-const Navbar = () => {
+const Navbar = ({ user }) => {
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out of your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const { data } = await logout();
+
+        if (data.status === 200 || data.message === "Logged out successfully") {
+          showAlert("Logged out!", "You have been logged out.", "success").then(
+            () => {
+              navigate("/login");
+            }
+          );
+        } else {
+          showAlert("Error", "Something went wrong while logging out", "error");
+        }
+      } catch (err) {
+        showAlert("Error", "Failed to logout", "error");
+      }
+    }
+  };
+  
   return (
     <nav className="w-full py-2 px-8 sticky top-0 z-50">
       <div className="mx-auto flex justify-between items-center">
@@ -15,14 +52,21 @@ const Navbar = () => {
               ยินดีต้อนรับ ,
             </p>
             <span className="text-[#1296BF] text-lg font-bold">
-              Sirapat Wongphatsawek
+              {user?.firstname} {user?.lastname}
             </span>
           </div>
           <img
-            src="https://placehold.co/50x50"
+            src={`${
+              user?.profile_image !== null
+                ? `${PROFILE_URL}/${user?.profile_image}`
+                : `https://placehold.co/50x50`
+            }`}
             className="rounded-full w-[50px] h-[50px]"
           />
-          <button className="bg-red-500 text-lg hover:bg-red-600 transition text-white px-4 py-2 rounded-md shadow-sm">
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-lg hover:bg-red-600 transition text-white px-4 py-2 rounded-md shadow-sm"
+          >
             ออกจากระบบ
           </button>
         </div>

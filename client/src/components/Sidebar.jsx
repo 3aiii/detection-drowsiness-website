@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, matchPath, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, matchPath, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaUserEdit,
@@ -8,9 +8,9 @@ import {
   FaHistory,
 } from "react-icons/fa";
 
-const Sidebar = () => {
+const Sidebar = ({ role }) => {
   const location = useLocation();
-  const role = "admin";
+  const navigate = useNavigate();
 
   const isActivated = (path) => {
     return location.pathname === path;

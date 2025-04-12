@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaFolderTree } from "react-icons/fa6";
+import { create, profile } from "../../../apis/userApi";
+import { showAlert } from "../../../utils/sweetProp";
 
 const Create = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -9,7 +11,7 @@ const Create = () => {
     email: "",
     firstname: "",
     lastname: "",
-    image: null,
+    profile_image: null,
   });
 
   const handleFileChange = (e) => {
@@ -20,10 +22,10 @@ const Create = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-      setFormData((prev) => ({ ...prev, image: file }));
+      setFormData((prev) => ({ ...prev, profile_image: file }));
     } else {
       setImagePreview(null);
-      setFormData((prev) => ({ ...prev, image: null }));
+      setFormData((prev) => ({ ...prev, profile_image: null }));
     }
   };
 
@@ -32,32 +34,25 @@ const Create = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiData = new FormData();
-    apiData.append("username", formData.username);
-    apiData.append("password", formData.password);
-    apiData.append("email", formData.email);
-    apiData.append("firstname", formData.firstname);
-    apiData.append("lastname", formData.lastname);
 
-    if (formData.image) {
-      apiData.append("image", formData.image);
+    try {
+      const { data } = await create(formData);
+      if (data) {
+        if (formData.profile_image instanceof File) {
+          await profile(formData.profile_image, data?.data);
+        }
+
+        showAlert("Success", "Data updated successfully.", "success").then(
+          () => {
+            window.location.reload();
+          }
+        );
+      }
+    } catch (error) {
+      showAlert("Error", `${error.message}`, "error");
     }
-
-    // ตัวอย่างการส่งข้อมูลไปยัง API
-    // fetch("/api/users", {
-    //   method: "POST",
-    //   body: apiData,
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     console.log("Response:", data);
-    //     // reset form ถ้าต้องการ
-    //   })
-    //   .catch((err) => {
-    //     console.error("Error:", err);
-    //   });
   };
 
   return (
@@ -182,7 +177,7 @@ const Create = () => {
               <button
                 onClick={() => {
                   setImagePreview(null);
-                  setFormData((prev) => ({ ...prev, image: null }));
+                  setFormData((prev) => ({ ...prev, profile_image: null }));
                 }}
                 type="button"
                 className="w-fit px-4 bg-[#1296BF] hover:bg-[#377c91] transition text-white rounded-lg py-1 mt-4 text-lg"

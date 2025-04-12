@@ -5,6 +5,6 @@ const authRoute = Router();
 
 authRoute.post("/login", authController.login);
 authRoute.post("/logout", authController.logout);
-authRoute.post("/verify", authController.verify);
+authRoute.get("/verify", authController.verify);
 
 module.exports = authRoute;

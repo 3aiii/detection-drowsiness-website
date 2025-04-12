@@ -1,49 +1,58 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaRegPlusSquare } from "react-icons/fa";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
 import Pagination from "../../../components/Pagination";
+import { fetchs, remove } from "../../../apis/userApi";
+import { showAlert } from "../../../utils/sweetProp";
+import Swal from "sweetalert2";
 
 const Index = () => {
-  const users = [
-    { id: 1, name: "สมชาย ใจดี", email: "somchai1@example.com", role: "admin" },
-    { id: 2, name: "สุดา สบายใจ", email: "suda@example.com", role: "user" },
-    {
-      id: 3,
-      name: "ทวีศักดิ์ ใฝ่รู้",
-      email: "tawee@example.com",
-      role: "user",
-    },
-    {
-      id: 4,
-      name: "พรทิพย์ พารวย",
-      email: "pornthip@example.com",
-      role: "admin",
-    },
-    {
-      id: 5,
-      name: "สมหญิง ใจเย็น",
-      email: "somying@example.com",
-      role: "user",
-    },
-    {
-      id: 6,
-      name: "เอกชัย เด่นดี",
-      email: "ekachai@example.com",
-      role: "user",
-    },
-  ];
+  const [users, setUsers] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(8);
   const startIndex = (currentPage - 1) * itemsPerPage;
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= Math.ceil(users.length / usersPerPage)) {
-      setCurrentPage(page);
+  const fetchUsers = async () => {
+    const { data } = await fetchs(currentPage, itemsPerPage);
+
+    setUsers(data);
+  };
+
+  const handleRemove = async (id) => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action will permanently delete the user.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        const { data } = await remove(id);
+        if (data) {
+          showAlert(
+            "Deleted",
+            "User has been removed successfully.",
+            "success"
+          ).then(() => {
+            fetchUsers();
+          });
+        }
+      } catch (error) {
+        showAlert("Error", `${error.message}`, "error");
+      }
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [currentPage]);
 
   return (
     <div className="px-6 py-8 mx-auto">
@@ -80,16 +89,16 @@ const Index = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {users?.map((user, index) => (
+              {users?.data?.map((user, index) => (
                 <tr
-                  key={user.id}
+                  key={index}
                   className="hover:bg-gray-50 transition duration-150 h-16"
                 >
                   <td className="px-6 py-4 text-gray-800 whitespace-nowrap">
                     {startIndex + index + 1}
                   </td>
                   <td className="px-6 py-4 text-gray-800 whitespace-nowrap">
-                    {user.name}
+                    {user.username}
                   </td>
                   <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
                     {user.email}
@@ -109,12 +118,15 @@ const Index = () => {
                   <td className="px-6 py-4">
                     <div className="flex justify-center gap-2">
                       <Link
-                        to={`/admin/edit/user/${user.id}`}
+                        to={`/admin/edit/user/${user.user_id}`}
                         className="p-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-lg transition"
                       >
                         <MdEdit size={25} />
                       </Link>
-                      <button className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition">
+                      <button
+                        onClick={() => handleRemove(user.user_id)}
+                        className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
+                      >
                         <MdDeleteForever size={25} />
                       </button>
                     </div>
@@ -128,8 +140,8 @@ const Index = () => {
 
       <Pagination
         currentPage={currentPage}
-        totalPages={Math.ceil(users.length / itemsPerPage)}
-        onPageChange={handlePageChange}
+        totalPages={users?.totalPage}
+        onPageChange={setCurrentPage}
       />
     </div>
   );
