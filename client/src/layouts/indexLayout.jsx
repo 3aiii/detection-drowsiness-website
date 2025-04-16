@@ -11,7 +11,7 @@ const IndexLayout = () => {
   useEffect(() => {
     const verifyUser = async () => {
       const { data } = await verify();
-      
+
       if (data?.message === "Can't find your token") {
         navigate("/login");
       } else {
@@ -28,7 +28,7 @@ const IndexLayout = () => {
         <Navbar user={user} />
       </div>
       <div className="flex gap-4 w-full px-8">
-        <div className="bg-white h-fit rounded-lg w-2/12">
+        <div className="bg-white h-fit rounded-lg w-3/12">
           <Sidebar role={user?.role} />
         </div>
         <div className="bg-white rounded-lg  w-10/12">

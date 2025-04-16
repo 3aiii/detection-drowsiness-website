@@ -32,7 +32,7 @@ module.exports = {
         totalPage: totalPage,
       });
     } catch (error) {
-      return res.send(error);
+      return res.send({ error: error.message });
     }
   },
   findOne: async (req, res) => {
@@ -93,12 +93,10 @@ module.exports = {
         [username, hashPassword, firstname, lastname, email, role]
       );
 
-      return res
-        .status(201)
-        .send({
-          data: result.insertId,
-          message: "Created account successfully",
-        });
+      return res.status(201).send({
+        data: result.insertId,
+        message: "Created account successfully",
+      });
     } catch (error) {
       return res.status(500).send({ error: error.message });
     }

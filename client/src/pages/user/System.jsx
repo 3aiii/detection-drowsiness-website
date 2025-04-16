@@ -1,6 +1,29 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import highHat from "../../assets/high_hat.wav";
+import ring from "../../assets/ring.wav";
+import traffic from "../../assets/traffic.wav";
 
 const System = () => {
+  const sounds = [
+    { name: "Ring Ring", file: ring },
+    { name: "High Hat", file: highHat },
+    { name: "Traffic", file: traffic },
+  ];
+
+  const audioRef = useRef(null);
+  const [currentSoundIndex, setCurrentSoundIndex] = useState(0);
+
+  const playSound = () => {
+    if (audioRef.current) {
+      audioRef.current.src = sounds[currentSoundIndex].file;
+      audioRef.current.play();
+    }
+  };
+
+  const changeSound = () => {
+    setCurrentSoundIndex((prev) => (prev + 1) % sounds.length);
+  };
+
   return (
     <div className="px-6 py-8 mx-auto">
       <div className="flex">
@@ -12,20 +35,29 @@ const System = () => {
             จัดการการตั้งค่าและดูประวัติการแจ้งเตือน
           </p>
 
-          <div className="bg-white rounded-xl  mb-8">
+          <div className="bg-white rounded-xl mb-8 p-4">
             <h2 className="text-xl font-medium mb-4">เสียงแจ้งเตือน</h2>
             <p className="text-gray-700 mb-2">
               เสียงแจ้งเตือนปัจจุบัน :{" "}
-              <span className="font-semibold text-[#1296BF]">Ring Ring</span>
+              <span className="font-semibold text-[#1296BF]">
+                {sounds[currentSoundIndex].name}
+              </span>
             </p>
             <div className="flex gap-4 mt-4">
-              <button className="bg-[#1296BF] hover:bg-[#0f7fa3] text-white px-4 py-2 rounded-lg shadow transition duration-200">
+              <button
+                onClick={playSound}
+                className="bg-[#1296BF] hover:bg-[#0f7fa3] text-white px-4 py-2 rounded-lg shadow transition duration-200"
+              >
                 ▶️ เล่นตัวอย่าง
               </button>
-              <button className="bg-[#1296BF] hover:bg-[#0f7fa3] text-white px-4 py-2 rounded-lg shadow transition duration-200">
+              <button
+                onClick={changeSound}
+                className="bg-[#1296BF] hover:bg-[#0f7fa3] text-white px-4 py-2 rounded-lg shadow transition duration-200"
+              >
                 🔄 เปลี่ยนเสียง
               </button>
             </div>
+            <audio ref={audioRef} hidden />
           </div>
         </div>
         <div className="w-1/2">

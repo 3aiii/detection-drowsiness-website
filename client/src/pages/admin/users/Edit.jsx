@@ -176,7 +176,7 @@ const Edit = () => {
           <div className="w-full md:w-1/2 flex items-center justify-center">
             {imagePreview || formData?.profile_image ? (
               <div className="flex flex-col items-center">
-                <p className="text-gray-600 mb-2">รูปภาพผู้ใช้งาน:</p>
+                <p className="text-gray-600 mb-2">รูปภาพผู้ใช้งาน</p>
                 <img
                   src={
                     imagePreview ||

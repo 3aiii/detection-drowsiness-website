@@ -1,7 +1,36 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import Webcam from "react-webcam";
 import { Link } from "react-router-dom";
 
 const Index = () => {
+  const webcamRef = useRef(null);
+  const [status, setStatus] = useState("ยังไม่เริ่ม");
+
+  const videoConstraints = {
+    width: 400,
+    height: 300,
+    facingMode: "user",
+  };
+
+  const captureAndSend = async () => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+
+      try {
+        setStatus("กำลังวิเคราะห์...");
+
+        // const response = await axios.post("http://localhost:5000/predict", {
+        //   image: imageSrc,
+        // });
+
+        // setStatus(response.data.result); // หรือ result อื่นๆ ตาม response จาก Flask
+      } catch (error) {
+        console.error("Error sending image:", error);
+        setStatus("เกิดข้อผิดพลาด");
+      }
+    }
+  };
+
   return (
     <div className="px-6 py-8 mx-auto">
       <h1 className="text-3xl font-semibold text-[#1296BF] mb-1">หน้าหลัก</h1>
@@ -10,29 +39,39 @@ const Index = () => {
         แจ้งเตือนเมื่อผู้ขับขี่มีความเสี่ยง
       </p>
 
-      <div>
-        <h2 className="text-xl font-semibold text-[#1296BF] mb-2">
-          กล้องตรวจจับใบหน้า
-        </h2>
-        <p className="text-gray-700 mb-4">
-          ระบบจะทำงานโดยใช้กล้องตรวจจับลักษณะใบหน้า เช่น การหาว การหลับตา
-          เพื่อประเมินความง่วงของผู้ขับขี่
-        </p>
+      <h2 className="text-xl font-semibold text-[#1296BF] mb-2">
+        กล้องตรวจจับใบหน้า
+      </h2>
 
-        <div className="flex items-center gap-4 mb-4">
-          <span className="text-gray-700">เสียงแจ้งเตือนปัจจุบัน:</span>
-          <span className="font-semibold text-[#1296BF]">Ring Ring</span>
-        </div>
+      <Webcam
+        audio={false}
+        height={300}
+        ref={webcamRef}
+        screenshotFormat="image/jpeg"
+        width={400}
+        videoConstraints={videoConstraints}
+        className="rounded-xl mb-4"
+      />
 
-        <div className="flex gap-4">
-          <button className="bg-[#1296BF] hover:bg-[#0f7fa3] text-white px-4 py-2 rounded-lg transition">
-            เริ่มตรวจจับ
-          </button>
-          <Link to={"/system"} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition">
-            เปลี่ยนเสียงแจ้งเตือน
-          </Link>
-        </div>
+      <div className="flex gap-4">
+        <button
+          onClick={captureAndSend}
+          className="bg-[#1296BF] hover:bg-[#0f7fa3] text-white px-4 py-2 rounded-lg transition"
+        >
+          ส่งภาพไปวิเคราะห์
+        </button>
+
+        <Link
+          to={"/system"}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition"
+        >
+          เปลี่ยนเสียงแจ้งเตือน
+        </Link>
       </div>
+
+      <p className="mt-4 text-gray-800 text-lg">
+        สถานะ: <span className="font-semibold">{status}</span>
+      </p>
     </div>
   );
 };

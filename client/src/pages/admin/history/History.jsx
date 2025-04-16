@@ -69,7 +69,7 @@ const History = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-1/2 mt-4">
+        <div className="flex flex-col items-center justify-center w-1/2">
           <img
             src={`https://cdn.proboxtv.com/uploads/gennadiy_golovkin_09f01015cc.jpg`}
             alt="preview"
