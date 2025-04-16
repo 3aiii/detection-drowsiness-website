@@ -9,3 +9,15 @@ export const fetchs = async (page, limit) => {
 export const fetch = async (id) => {
   return await get(`user/${id}`);
 };
+
+export const detection = async (imageSrc, userId) => {
+  return await axios.post(`${APP_URL}/system/detection`, {
+    image: imageSrc,
+    userId,
+  }, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+};

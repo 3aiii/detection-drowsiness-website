@@ -95,7 +95,7 @@ module.exports = {
       const userId = decoded.user_id;
 
       const [user] = await connector.execute(
-        `SELECT user_id,username,email,firstname,lastname,role,profile_image FROM user_tbl WHERE user_id = ?`,
+        `SELECT user_id,username,email,firstname,lastname,role,profile_image,sound FROM user_tbl WHERE user_id = ?`,
         [userId]
       );
 

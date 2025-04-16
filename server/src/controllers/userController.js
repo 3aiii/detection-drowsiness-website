@@ -141,8 +141,7 @@ module.exports = {
       };
 
       const [updateUser] = await connector.execute(
-        `UPDATE user_tbl SET username = ?, ${
-          hashPassword ? "password = ?," : ""
+        `UPDATE user_tbl SET username = ?, ${hashPassword ? "password = ?," : ""
         } firstname = ?, lastname = ?, email = ? WHERE user_id = ?`,
         [
           updatedData.username,
@@ -216,4 +215,23 @@ module.exports = {
       });
     }
   },
+  changeSound: async (req, res) => {
+    const { sound } = req.body
+    const   userId = req.params.id
+
+    try {
+      const [userData] = await connector.execute(`SELECT * FROM user_tbl WHERE user_id = ?`, [userId])
+      if (userData.length === 0) {
+        return res.send({ message: "User not found" });
+      }
+
+      await connector.execute(`UPDATE user_tbl SET sound = ? WHERE user_id = ?`, [sound, userId])
+
+      return res.send({
+        message: "update sound successfully"
+      })
+    } catch (error) {
+      return res.send(error.message)
+    }
+  }
 };

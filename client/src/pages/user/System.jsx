@@ -1,17 +1,18 @@
-import React, { useRef, useState } from "react";
-import highHat from "../../assets/high_hat.wav";
-import ring from "../../assets/ring.wav";
-import traffic from "../../assets/traffic.wav";
+import React, { useEffect, useRef, useState } from "react";
+import { changeSoundAPI } from "../../apis/userApi";
+import { verify } from "../../apis/authApi";
 
 const System = () => {
   const sounds = [
-    { name: "Ring Ring", file: ring },
-    { name: "High Hat", file: highHat },
-    { name: "Traffic", file: traffic },
+    { name: "Alert Detect", file: "/sounds/alert-detect_02.mp3", file_path: "alert-detect_02.mp3" },
+    { name: "High Hat", file: "/sounds/high_hat.wav", file_path: "high_hat.wav" },
+    { name: "Eas Endtone", file: "/sounds/eas-endtone_04.mp3", file_path: "eas-endtone_04.mp3" },
+    { name: "Warning Alerm", file: "/sounds/severe-warningalarm_03.mp3", file_path: "severe-warningalarm_03.mp3" },
   ];
 
   const audioRef = useRef(null);
   const [currentSoundIndex, setCurrentSoundIndex] = useState(0);
+  const [user, setUser] = useState([])
 
   const playSound = () => {
     if (audioRef.current) {
@@ -20,9 +21,42 @@ const System = () => {
     }
   };
 
-  const changeSound = () => {
-    setCurrentSoundIndex((prev) => (prev + 1) % sounds.length);
+  const changeSound = async () => {
+    const newIndex = (currentSoundIndex + 1) % sounds.length;
+    const selectedSound = sounds[newIndex];
+
+    setCurrentSoundIndex(newIndex);
+
+    try {
+      await changeSoundAPI({ sound: selectedSound.file_path }, user?.user_id);
+
+      setUser(prev => ({
+        ...prev,
+        sound: selectedSound.file_path,
+      }));
+    } catch (err) {
+      console.error("Failed to update sound:", err.message);
+    }
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await verify();
+      const userData = data?.user;
+
+      setUser(userData);
+
+      if (userData?.sound) {
+        const foundIndex = sounds.findIndex(sound => sound.file_path === userData.sound);
+        if (foundIndex !== -1) {
+          setCurrentSoundIndex(foundIndex);
+        }
+      }
+    };
+
+    fetchUser();
+  }, []);
+
 
   return (
     <div className="px-6 py-8 mx-auto">
@@ -35,12 +69,12 @@ const System = () => {
             จัดการการตั้งค่าและดูประวัติการแจ้งเตือน
           </p>
 
-          <div className="bg-white rounded-xl mb-8 p-4">
-            <h2 className="text-xl font-medium mb-4">เสียงแจ้งเตือน</h2>
+          <div className="bg-white rounded-xl mb-8 p-4 px-0">
+            <h2 className="text-xl font-medium">เสียงแจ้งเตือน</h2>
             <p className="text-gray-700 mb-2">
               เสียงแจ้งเตือนปัจจุบัน :{" "}
               <span className="font-semibold text-[#1296BF]">
-                {sounds[currentSoundIndex].name}
+                {user?.sound ? user?.sound : sounds[currentSoundIndex].name}
               </span>
             </p>
             <div className="flex gap-4 mt-4">

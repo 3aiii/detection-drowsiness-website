@@ -14,7 +14,7 @@ app.use("/image", express.static(path.join(__dirname, "images/systems")));
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: `${process.env.VITE_APP}`,
     credentials: true,
   })
 );

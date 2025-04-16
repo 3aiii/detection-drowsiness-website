@@ -37,6 +37,15 @@ export const update = async (data, id) => {
   });
 };
 
+export const changeSoundAPI = async (sound, id) => {
+  return await axios.put(`${APP_URL}/user/change-sound/${id}`, sound, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  })
+}
+
 export const profile = async (formData, id) => {
   const form = new FormData();
   form.append("upload", formData);
