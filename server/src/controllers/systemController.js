@@ -1,5 +1,7 @@
 const connector = require("../database/connector");
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 require('dotenv').config()
 
@@ -13,25 +15,21 @@ module.exports = {
       const [countHistory] = await connector.execute(`
         SELECT 
           COUNT(*) as total
-        FROM detection_id d
-          JOIN history_tbl h ON d.history_id = h.history_id
-          JOIN user_tbl u ON h.user_id = u.user_id
+        FROM detection_tbl d
       `);
 
       const totalPage = Math.ceil(countHistory[0].total / limit);
 
-      const [history] = connector.execute(
+      const [history] = await connector.execute(
         `      
           SELECT 
             d.*, 
-            h.history_id, 
-            h.user_id, 
-            u.name AS user_name, 
-            u.email AS user_email
-          FROM detection_id d
-          JOIN history_tbl h ON d.history_id = h.history_id
-          JOIN user_tbl u ON h.user_id = u.user_id
-          ORDER BY d.detected_at DESC
+            u.firstname AS fname, 
+            u.lastname AS lname, 
+            u.email AS email
+          FROM detection_tbl d
+          JOIN user_tbl u ON d.user_id = u.user_id
+          ORDER BY d.detection_time DESC
           LIMIT ? OFFSET ?
       `,
         [limit, offset]
@@ -47,10 +45,36 @@ module.exports = {
         totalPage: totalPage,
       });
     } catch (error) {
+      console.log(error)
       return res.send({ error: error.message });
     }
   },
-  findOne: async (req, res) => { },
+  findOne: async (req, res) => {
+    const detection_id = req.params.id
+
+    try {
+      const [history] = await connector.execute(
+        `      
+          SELECT detection_tbl.* , user_tbl.firstname ,user_tbl.lastname ,user_tbl.email 
+          FROM detection_tbl 
+          JOIN user_tbl ON detection_tbl.user_id = user_tbl.user_id
+          WHERE detection_id = ?
+          ORDER BY detection_time DESC 
+      `,
+        [detection_id]
+      );
+
+      if (history.length === 0) {
+        return res.send({ message: "Can't find history" });
+      }
+
+      return res.status(200).send({
+        data: history[0]
+      })
+    } catch (error) {
+      return res.send({ error: error.message });
+    }
+  },
   detection: async (req, res) => {
     const { image, userId } = req.body;
     try {
@@ -105,7 +129,28 @@ module.exports = {
         detection_time,
       ];
 
-      await connector.execute(insertSql, values);
+      const [detectionLog] = await connector.execute(insertSql, values);
+
+      const saveImagePath = path.join(__dirname, '..', 'images', 'systems');
+
+      if (!fs.existsSync(saveImagePath)) {
+        fs.mkdirSync(saveImagePath, { recursive: true });
+      }
+
+      if (result.alert_text) {
+        if (image?.startsWith("data:image")) {
+          const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+          const buffer = Buffer.from(base64Data, 'base64');
+
+          const ext = image.includes('image/png') ? 'png' : 'jpg';
+          const filename = `user_${userId || 0}_${Date.now()}.${ext}`;
+          const filePath = path.join(saveImagePath, filename);
+
+          fs.writeFileSync(filePath, buffer);
+
+          await connector.execute(`UPDATE detection_tbl SET image = ? WHERE detection_id = ?`, [filename, detectionLog?.insertId])
+        }
+      }
 
       return res.send(result);
     } catch (err) {

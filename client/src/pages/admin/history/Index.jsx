@@ -1,58 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Pagination from "../../../components/Pagination";
 import { FaEye } from "react-icons/fa6";
+import { fetchs } from "../../../apis/systemApi";
+import { formatDate } from "../../../utils/sweetProp";
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [history, setHistory] = useState([])
   const startIndex = (currentPage - 1) * itemsPerPage;
+  console.log(history)
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const { data } = await fetchs(currentPage, itemsPerPage)
 
-  const mockHistory = [
-    {
-      id: 1,
-      name: "สมชาย ใจดี",
-      model: "ตรวจจับอาการง่วง",
-      status: "ง่วง",
-      timestamp: "2025-04-11 08:15",
-    },
-    {
-      id: 2,
-      name: "สุภาพร น่ารัก",
-      model: "ตรวจจับการหาว",
-      status: "ไม่ง่วง",
-      timestamp: "2025-04-11 09:40",
-    },
-    {
-      id: 3,
-      name: "กิตติชัย ทองดี",
-      model: "ตรวจจับการหลับตา",
-      status: "ง่วง",
-      timestamp: "2025-04-10 18:30",
-    },
-    {
-      id: 4,
-      name: "ณัฐวุฒิ แสนดี",
-      model: "ประเมินความเหนื่อย",
-      status: "ไม่ง่วง",
-      timestamp: "2025-04-09 11:20",
-    },
-    {
-      id: 5,
-      name: "สายฝน เย็นใจ",
-      model: "ระบบแจ้งเตือน",
-      status: "ง่วง",
-      timestamp: "2025-04-08 22:45",
-    },
-    {
-      id: 6,
-      name: "ปิ่นมณี รุ่งเรือง",
-      model: "วิเคราะห์สีหน้า",
-      status: "ไม่ง่วง",
-      timestamp: "2025-04-07 16:10",
-    },
-  ];
+      setHistory(data)
+    }
+
+    fetchHistory()
+  }, [currentPage])
 
   return (
     <div className="px-6 py-8 mx-auto">
@@ -66,66 +34,77 @@ const Index = () => {
       </div>
       <div>
         <div className="mt-6 bg-white rounded-xl border overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead className="bg-[#1296BF] text-white text-left">
-              <tr className="text-base">
-                <th className="w-12 font-semibold text-center">#</th>
-                <th className="px-6 py-4 font-semibold">ชื่อผู้ใช้งาน</th>
-                <th className="px-6 py-4 font-semibold">ชื่อโมเดลที่ใช้</th>
-                <th className="px-6 py-4 font-semibold">สถานะผลการตรวจจับ</th>
-                <th className="px-6 py-4 font-semibold">เวลาในการใช้งาน</th>
-                <th className="px-6 py-4 font-semibold"></th>
+          <table className="min-w-full table-auto text-sm">
+            <thead className="bg-[#1296BF] text-white">
+              <tr className="text-left">
+                <th className="w-12 text-center py-3 font-semibold">#</th>
+                <th className="px-4 py-3 font-semibold min-w-[150px]">ชื่อผู้ใช้งาน</th>
+                <th className="px-4 py-3 font-semibold min-w-[120px]">สถานะ</th>
+                <th className="px-4 py-3 font-semibold text-center">กระพริบตา</th>
+                <th className="px-4 py-3 font-semibold text-center">การหาว</th>
+                <th className="px-4 py-3 font-semibold text-center">Microsleeps</th>
+                <th className="px-4 py-3 font-semibold text-center">Yawn Duration</th>
+                <th className="px-4 py-3 font-semibold min-w-[140px]">เวลาตรวจจับ</th>
+                <th className="px-4 py-3 font-semibold text-center"></th>
               </tr>
             </thead>
+
             <tbody className="divide-y divide-gray-200">
-              {mockHistory?.map((his, index) => (
-                <tr
-                  key={his.id}
-                  className="hover:bg-gray-50 transition duration-150 h-16"
-                >
-                  <td className="px-6 py-4 text-gray-800 whitespace-nowrap">
-                    {startIndex + index + 1}
+              {history?.message === "Can't find history" ? (
+                <tr>
+                  <td colSpan={9} className="py-6 text-center bg-white">
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="text-xl text-gray-600 font-medium">ไม่มีการใช้งานระบบ</p>
+                      <p className="text-gray-400 mt-1">ยังไม่มีข้อมูลการตรวจจับที่บันทึกไว้</p>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 text-gray-800 whitespace-nowrap">
-                    {his.name}
-                  </td>
-                  <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
-                    {his.model}
-                  </td>
-                  <td className="px-6 py-4 ">
-                    <span
-                      className={`inline-block px-3 py-1 text-sm font-medium cursor-default
-                  ${
-                    his.status === "ไม่ง่วง"
-                      ? `text-green-700 bg-green-100`
-                      : `text-red-700 bg-red-100`
-                  } rounded-full`}
-                    >
-                      {his.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
-                    {his.timestamp}
-                  </td>
-                  <td className="flex px-6 py-4">
-                    <Link
-                      to={`/admin/view/history/${his.id}`}
-                      className="p-2 bg-blue-400 hover:bg-blue-500 text-white rounded-lg transition"
-                    >
-                      <FaEye size={25} />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+                </tr>) : (
+                history?.data?.map((his, index) => (
+                  <tr key={index} className="hover:bg-gray-50 transition duration-150">
+                    <td className="text-center py-4">{startIndex + index + 1}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{his.fname} {his.lname}</td>
+
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-block px-3 py-1 text-sm font-medium rounded-full
+                ${his.status === "Alert"
+                            ? "text-red-700 bg-red-100"
+                            : "text-green-700 bg-green-100"
+                          }`}
+                      >
+                        {his.status === "Alert" ? `แจ้งเตือน` : `ไม่มีการแจ้งเตือน`}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-4 text-center">{his.blinks}</td>
+                    <td className="px-4 py-4 text-center">{his.yawns}</td>
+                    <td className="px-4 py-4 text-center">{his.microsleeps}</td>
+                    <td className="px-4 py-4 text-center">{his.yawn_duration}</td>
+
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {formatDate(his.detection_time)}
+                    </td>
+
+                    <td className="px-4 py-4 text-center">
+                      <Link
+                        to={`/admin/view/history/${his.detection_id}`}
+                        className="inline-block p-2 bg-blue-400 hover:bg-blue-500 text-white rounded-lg transition"
+                      >
+                        <FaEye size={18} />
+                      </Link>
+                    </td>
+                  </tr>
+                )
+                ))}
             </tbody>
           </table>
         </div>
       </div>
 
       <Pagination
-        currentPage={currentPage}
-        totalPages={Math.ceil(mockHistory.length / itemsPerPage)}
-        // onPageChange={handlePageChange}
+        currentPage={history?.currentPage}
+        totalPages={history?.totalPage}
+        onPageChange={setCurrentPage}
       />
     </div>
   );

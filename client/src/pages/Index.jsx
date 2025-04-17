@@ -29,6 +29,7 @@ const Index = () => {
     }, 300);
     return () => clearInterval(interval);
   }, [cameraOn]);
+
   useEffect(() => {
     if (
       result.alert_text?.toLowerCase().includes("prolonged") ||
@@ -53,6 +54,7 @@ const Index = () => {
   const captureAndSendFrame = async () => {
     if (!webcamRef.current) return;
     const imageSrc = webcamRef.current.getScreenshot();
+    
     if (imageSrc) {
       try {
         const response = await detection(imageSrc, user?.user_id);

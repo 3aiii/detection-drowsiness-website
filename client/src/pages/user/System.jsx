@@ -74,7 +74,7 @@ const System = () => {
             <p className="text-gray-700 mb-2">
               เสียงแจ้งเตือนปัจจุบัน :{" "}
               <span className="font-semibold text-[#1296BF]">
-                {user?.sound ? user?.sound : sounds[currentSoundIndex].name}
+                {user?.sound}
               </span>
             </p>
             <div className="flex gap-4 mt-4">

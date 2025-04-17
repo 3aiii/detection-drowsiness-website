@@ -13,3 +13,15 @@ export const showAlert = (title, text, icon = "info") => {
     },
   });
 };
+
+export const formatDate = (dateTime) => {
+  const date = new Date(dateTime).toLocaleString("th-TH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+
+  return date
+}
