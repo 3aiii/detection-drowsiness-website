@@ -21,10 +21,9 @@ const Sidebar = ({ role }) => {
       <Link
         to="/"
         className={`flex items-center gap-3 px-4 py-2 rounded-md text-lg font-medium transition-all duration-200
-          ${
-            isActivated("/")
-              ? "bg-[#1296BF] text-white"
-              : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
+          ${isActivated("/")
+            ? "bg-[#1296BF] text-white"
+            : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
           }`}
       >
         <FaHome />
@@ -34,10 +33,9 @@ const Sidebar = ({ role }) => {
       <Link
         to="/profile"
         className={`flex items-center gap-3 px-4 py-2 rounded-md text-lg font-medium transition-all duration-200
-          ${
-            isActivated("/profile")
-              ? "bg-[#1296BF] text-white"
-              : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
+          ${isActivated("/profile")
+            ? "bg-[#1296BF] text-white"
+            : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
           }`}
       >
         <FaUserEdit />
@@ -47,14 +45,13 @@ const Sidebar = ({ role }) => {
       <Link
         to="/system"
         className={`flex items-center gap-3 px-4 py-2 rounded-md text-lg font-medium transition-all duration-200
-          ${
-            isActivated("/system")
-              ? "bg-[#1296BF] text-white"
-              : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
+          ${isActivated("/system")
+            ? "bg-[#1296BF] text-white"
+            : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
           }`}
       >
         <FaEdit />
-        ตั้งค่าระบบ
+        ตั้งค่า & ประวัติ
       </Link>
 
       {role === "admin" && (
@@ -62,12 +59,11 @@ const Sidebar = ({ role }) => {
           <Link
             to="/admin/user"
             className={`flex items-center gap-3 px-4 py-2 rounded-md text-lg font-medium transition-all duration-200
-              ${
-                isActivated("/admin/user") ||
+              ${isActivated("/admin/user") ||
                 isActivated("/admin/create/user") ||
                 matchPath("/admin/edit/user/:id", location.pathname)
-                  ? "bg-[#1296BF] text-white"
-                  : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
+                ? "bg-[#1296BF] text-white"
+                : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
               }`}
           >
             <FaUserAlt />
@@ -77,11 +73,10 @@ const Sidebar = ({ role }) => {
           <Link
             to="/admin/history"
             className={`flex items-center gap-3 px-4 py-2 rounded-md text-lg font-medium transition-all duration-200
-              ${
-                isActivated("/admin/history") ||
+              ${isActivated("/admin/history") ||
                 matchPath("admin/view/history/:id", location.pathname)
-                  ? "bg-[#1296BF] text-white"
-                  : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
+                ? "bg-[#1296BF] text-white"
+                : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
               }`}
           >
             <FaHistory />

@@ -158,4 +158,39 @@ module.exports = {
       return res.status(500).send({ error: 'Error processing image' });
     }
   },
+  findById: async (req, res) => {
+    const userId = req.params.id
+    
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const offset = (page - 1) * limit;
+
+    if (!userId) {
+      return res.send({ message: "Please, send userId" })
+    }
+
+    try {
+      const [countHistory] = await connector.execute(`
+        SELECT 
+          COUNT(*) as total
+        FROM detection_tbl d
+      `);
+
+      const totalPage = Math.ceil(countHistory[0].total / limit);
+
+      const [result] = await connector.execute(`SELECT * FROM detection_tbl WHERE user_id = ? ORDER BY detection_time DESC LIMIT ? OFFSET ?`, [userId, limit, offset])
+
+      if (result.length === 0) {
+        return res.send({ message: "Can't find your history used" })
+      }
+
+      return res.status(200).send({
+        result,
+        currentPage: page,
+        totalPage: totalPage,
+      })
+    } catch (error) {
+      return res.send(error.message)
+    }
+  }
 }

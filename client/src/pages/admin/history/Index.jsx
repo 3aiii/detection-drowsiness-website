@@ -11,7 +11,7 @@ const Index = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [history, setHistory] = useState([])
   const startIndex = (currentPage - 1) * itemsPerPage;
-  console.log(history)
+
   useEffect(() => {
     const fetchHistory = async () => {
       const { data } = await fetchs(currentPage, itemsPerPage)

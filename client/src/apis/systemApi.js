@@ -10,6 +10,10 @@ export const fetch = async (id) => {
   return await get(`system/${id}`);
 };
 
+export const findById = async (id, page, limit) => {
+  return await get(`system/findById/${id}?page=${page}&limit=${limit}`)
+}
+
 export const detection = async (imageSrc, userId) => {
   return await axios.post(`${APP_URL}/system/detection`, {
     image: imageSrc,

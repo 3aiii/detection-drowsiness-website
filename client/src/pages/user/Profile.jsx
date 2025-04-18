@@ -88,10 +88,9 @@ const Profile = () => {
             <img
               src={
                 preview ||
-                `${
-                  formData?.profile_image
-                    ? `${PROFILE_URL}/${formData?.profile_image}`
-                    : `https://placehold.co/128x128`
+                `${formData?.profile_image
+                  ? `${PROFILE_URL}/${formData?.profile_image}`
+                  : `https://placehold.co/128x128`
                 }`
               }
               alt="profile"

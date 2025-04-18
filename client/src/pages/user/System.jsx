@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { changeSoundAPI } from "../../apis/userApi";
 import { verify } from "../../apis/authApi";
+import { findById } from "../../apis/systemApi";
+import Pagination from "../../components/Pagination";
 
 const System = () => {
   const sounds = [
@@ -12,8 +14,13 @@ const System = () => {
 
   const audioRef = useRef(null);
   const [currentSoundIndex, setCurrentSoundIndex] = useState(0);
-  const [user, setUser] = useState([])
+  const [userHistory, setUserHistory] = useState([])
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const startIndex = (currentPage - 1) * itemsPerPage;
 
+  const [user, setUser] = useState([])
   const playSound = () => {
     if (audioRef.current) {
       audioRef.current.src = sounds[currentSoundIndex].file;
@@ -40,22 +47,30 @@ const System = () => {
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await verify();
-      const userData = data?.user;
+    const fetchAll = async () => {
+      try {
+        const { data } = await verify();
+        const userData = data?.user;
+        setUser(userData);
 
-      setUser(userData);
-
-      if (userData?.sound) {
-        const foundIndex = sounds.findIndex(sound => sound.file_path === userData.sound);
-        if (foundIndex !== -1) {
-          setCurrentSoundIndex(foundIndex);
+        if (userData?.sound) {
+          const foundIndex = sounds.findIndex(sound => sound.file_path === userData.sound);
+          if (foundIndex !== -1) {
+            setCurrentSoundIndex(foundIndex);
+          }
         }
+
+        if (userData?.user_id) {
+          const { data: historyData } = await findById(userData?.user_id, currentPage, itemsPerPage);
+          setUserHistory(historyData);
+        }
+      } catch (error) {
+        console.error("Error loading user or history:", error);
       }
     };
 
-    fetchUser();
-  }, []);
+    fetchAll();
+  }, [currentPage]);
 
 
   return (
@@ -102,37 +117,60 @@ const System = () => {
       <div className="rounded-xl">
         <h2 className="text-xl font-medium mb-4">ประวัติการแจ้งเตือน</h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto border border-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="text-left px-4 py-2 border-b text-gray-700 font-semibold">
-                  วันที่
-                </th>
-                <th className="text-left px-4 py-2 border-b text-gray-700 font-semibold">
-                  เวลา
-                </th>
-                <th className="text-left px-4 py-2 border-b text-gray-700 font-semibold">
-                  สถานะ
-                </th>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 border-b">ลำดับ</th>
+                <th className="px-4 py-2 border-b">วันที่</th>
+                <th className="px-4 py-2 border-b">เวลา</th>
+                <th className="px-4 py-2 border-b">สถานะ</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="hover:bg-gray-50">
-                <td className="px-4 py-2 border-b">20 ม.ค. 2025</td>
-                <td className="px-4 py-2 border-b">14:30</td>
-                <td className="px-4 py-2 border-b text-[#D97706] font-medium">
-                  แจ้งเตือน
-                </td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="px-4 py-2 border-b">19 ม.ค. 2025</td>
-                <td className="px-4 py-2 border-b">18:45</td>
-                <td className="px-4 py-2 border-b text-[#D97706] font-medium">
-                  แจ้งเตือน
-                </td>
-              </tr>
+              {userHistory?.message === "Can't find your history used"
+                ? (
+                  <tr>
+                    <td colSpan="4" className="text-center py-4 text-gray-500">
+                      ไม่พบประวัติการใช้งาน
+                    </td>
+                  </tr>
+                ) : (
+                  userHistory?.result?.map((userHis, index) => {
+                    const detectionDate = new Date(userHis.detection_time);
+                    const dateStr = detectionDate.toLocaleDateString("th-TH", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    });
+
+                    const timeStr = detectionDate.toLocaleTimeString("th-TH", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    });
+
+                    const statusColor =
+                      userHis.status === "Non-Alert" ? "text-green-600" : "text-red-500";
+
+                    return (
+                      <tr className="hover:bg-gray-50" key={index}>
+                        <td className="text-center py-4 border-b">{startIndex + index + 1}</td>
+                        <td className="px-4 py-2 border-b">{dateStr}</td>
+                        <td className="px-4 py-2 border-b">{timeStr}</td>
+                        <td className={`px-4 py-2 text-center border-b font-medium ${statusColor}`}>
+                          {userHis.status === "Non-Alert" ? "ไม่แจ้งเตือน" : "แจ้งเตือน"}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
             </tbody>
           </table>
+
+          <Pagination
+            currentPage={userHistory?.currentPage}
+            totalPages={userHistory?.totalPage}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
     </div>
