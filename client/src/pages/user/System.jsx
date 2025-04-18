@@ -16,7 +16,7 @@ const System = () => {
   const [currentSoundIndex, setCurrentSoundIndex] = useState(0);
   const [userHistory, setUserHistory] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const startIndex = (currentPage - 1) * itemsPerPage;
 
@@ -154,8 +154,8 @@ const System = () => {
                     return (
                       <tr className="hover:bg-gray-50" key={index}>
                         <td className="text-center py-4 border-b">{startIndex + index + 1}</td>
-                        <td className="px-4 py-2 border-b">{dateStr}</td>
-                        <td className="px-4 py-2 border-b">{timeStr}</td>
+                        <td className="px-4 py-2 border-b text-center">{dateStr}</td>
+                        <td className="px-4 py-2 border-b text-center">{timeStr}</td>
                         <td className={`px-4 py-2 text-center border-b font-medium ${statusColor}`}>
                           {userHis.status === "Non-Alert" ? "ไม่แจ้งเตือน" : "แจ้งเตือน"}
                         </td>
