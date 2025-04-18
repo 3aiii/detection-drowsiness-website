@@ -119,7 +119,7 @@ def predict():
                 # Alert logic
                 if yawn_duration > 0.5:
                     alert_text = "⚠️ Alert: Prolonged Yawn Detected!"
-                elif microsleeps > 3.0:
+                elif microsleeps > 0.5:
                     alert_text = "⚠️ Alert: Prolonged Microsleep Detected!"
                     
     return jsonify({

@@ -37,7 +37,7 @@ const Navbar = ({ user }) => {
       }
     }
   };
-  
+
   return (
     <nav className="w-full py-2 px-8 sticky top-0 z-50">
       <div className="mx-auto flex justify-between items-center">
@@ -56,11 +56,10 @@ const Navbar = ({ user }) => {
             </span>
           </div>
           <img
-            src={`${
-              user?.profile_image !== null
+            src={`${user?.profile_image !== null
                 ? `${PROFILE_URL}/${user?.profile_image}`
                 : `https://placehold.co/50x50`
-            }`}
+              }`}
             className="rounded-full w-[50px] h-[50px]"
           />
           <button

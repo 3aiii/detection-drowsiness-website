@@ -81,33 +81,34 @@ module.exports = {
       const response = await axios.post(`${process.env.FLASK_APP}/predict`, { image });
       const result = response.data;
 
-      const status = result.alert_text?.toLowerCase().includes('microsleep') || result.alert_text?.toLowerCase().includes('prolonged')
-        ? 'Alert'
-        : 'Non-Alert';
+      if (result.alert_text) {
+        const status = result.alert_text?.toLowerCase().includes('microsleep') || result.alert_text?.toLowerCase().includes('prolonged')
+          ? 'Alert'
+          : 'Non-Alert';
 
-      const detection_time = new Date();
+        const detection_time = new Date();
 
-      const checkSql = `
+        const checkSql = `
         SELECT * FROM detection_tbl
         WHERE user_id = ? AND yawns = ? AND blinks = ? AND microsleeps = ? AND yawn_duration = ? AND status = ?
         ORDER BY detection_time DESC
         LIMIT 1
       `;
 
-      const [rows] = await connector.execute(checkSql, [
-        userId || 0,
-        result.yawns,
-        result.blinks,
-        result.microsleeps,
-        result.yawn_duration,
-        status
-      ]);
+        const [rows] = await connector.execute(checkSql, [
+          userId || 0,
+          result.yawns,
+          result.blinks,
+          result.microsleeps,
+          result.yawn_duration,
+          status
+        ]);
 
-      if (rows.length > 0) {
-        return res.send({ ...result, note: "Skipped duplicate detection" });
-      }
+        if (rows.length > 0) {
+          return res.send({ ...result, note: "Skipped duplicate detection" });
+        }
 
-      const insertSql = `
+        const insertSql = `
         INSERT INTO detection_tbl (
           user_id,
           yawns,
@@ -119,25 +120,24 @@ module.exports = {
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
 
-      const values = [
-        userId || 0,
-        result.yawns,
-        result.blinks,
-        result.microsleeps,
-        result.yawn_duration,
-        status,
-        detection_time,
-      ];
+        const values = [
+          userId || 0,
+          result.yawns,
+          result.blinks,
+          result.microsleeps,
+          result.yawn_duration,
+          status,
+          detection_time,
+        ];
 
-      const [detectionLog] = await connector.execute(insertSql, values);
+        const [detectionLog] = await connector.execute(insertSql, values);
 
-      const saveImagePath = path.join(__dirname, '..', 'images', 'systems');
+        const saveImagePath = path.join(__dirname, '..', 'images', 'systems');
 
-      if (!fs.existsSync(saveImagePath)) {
-        fs.mkdirSync(saveImagePath, { recursive: true });
-      }
-
-      if (result.alert_text) {
+        if (!fs.existsSync(saveImagePath)) {
+          fs.mkdirSync(saveImagePath, { recursive: true });
+        }
+        
         if (image?.startsWith("data:image")) {
           const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
           const buffer = Buffer.from(base64Data, 'base64');
@@ -160,7 +160,7 @@ module.exports = {
   },
   findById: async (req, res) => {
     const userId = req.params.id
-    
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const offset = (page - 1) * limit;

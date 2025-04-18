@@ -156,8 +156,16 @@ const System = () => {
                         <td className="text-center py-4 border-b">{startIndex + index + 1}</td>
                         <td className="px-4 py-2 border-b text-center">{dateStr}</td>
                         <td className="px-4 py-2 border-b text-center">{timeStr}</td>
-                        <td className={`px-4 py-2 text-center border-b font-medium ${statusColor}`}>
-                          {userHis.status === "Non-Alert" ? "ไม่แจ้งเตือน" : "แจ้งเตือน"}
+                        <td className="px-4 py-4 text-center">
+                          <span
+                            className={`inline-block px-3 py-1 text-sm font-medium rounded-full
+                ${userHis.status === "Alert"
+                                ? "text-red-700 bg-red-100"
+                                : "text-green-700 bg-green-100"
+                              }`}
+                          >
+                            {userHis.status === "Alert" ? `แจ้งเตือน` : `ไม่มีการแจ้งเตือน`}
+                          </span>
                         </td>
                       </tr>
                     );
