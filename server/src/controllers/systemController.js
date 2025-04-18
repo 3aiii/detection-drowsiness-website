@@ -137,7 +137,7 @@ module.exports = {
         if (!fs.existsSync(saveImagePath)) {
           fs.mkdirSync(saveImagePath, { recursive: true });
         }
-        
+
         if (image?.startsWith("data:image")) {
           const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
           const buffer = Buffer.from(base64Data, 'base64');
@@ -173,8 +173,9 @@ module.exports = {
       const [countHistory] = await connector.execute(`
         SELECT 
           COUNT(*) as total
-        FROM detection_tbl d
-      `);
+        FROM detection_tbl 
+        WHERE user_id = ?
+      `, [userId]);
 
       const totalPage = Math.ceil(countHistory[0].total / limit);
 

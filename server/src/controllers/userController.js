@@ -67,7 +67,7 @@ module.exports = {
       email,
       role = "user",
     } = req.body;
-
+    
     if (!username || !password || !firstname || !lastname || !email) {
       return res.send({
         message: "Please, fill your data",

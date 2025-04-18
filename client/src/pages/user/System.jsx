@@ -3,6 +3,9 @@ import { changeSoundAPI } from "../../apis/userApi";
 import { verify } from "../../apis/authApi";
 import { findById } from "../../apis/systemApi";
 import Pagination from "../../components/Pagination";
+import { formatDate } from "../../utils/sweetProp";
+import { Link } from "react-router-dom";
+import { FaEye } from "react-icons/fa6";
 
 const System = () => {
   const sounds = [
@@ -27,7 +30,7 @@ const System = () => {
       audioRef.current.play();
     }
   };
-
+  console.log(userHistory)
   const changeSound = async () => {
     const newIndex = (currentSoundIndex + 1) % sounds.length;
     const selectedSound = sounds[newIndex];
@@ -121,45 +124,32 @@ const System = () => {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-4 py-2 border-b">ลำดับ</th>
-                <th className="px-4 py-2 border-b">วันที่</th>
-                <th className="px-4 py-2 border-b">เวลา</th>
+                <th className="px-4 py-2 border-b">Microsleeps</th>
+                <th className="px-4 py-2 border-b">Yawn Duration</th>
                 <th className="px-4 py-2 border-b">สถานะ</th>
+                <th className="px-4 py-2 border-b">วันเวลา</th>
+                <th className="px-4 py-2 border-b"></th>
               </tr>
             </thead>
             <tbody>
               {userHistory?.message === "Can't find your history used"
                 ? (
                   <tr>
-                    <td colSpan="4" className="text-center py-4 text-gray-500">
+                    <td colSpan="5" className="text-center py-4 text-gray-500">
                       ไม่พบประวัติการใช้งาน
                     </td>
                   </tr>
                 ) : (
                   userHistory?.result?.map((userHis, index) => {
-                    const detectionDate = new Date(userHis.detection_time);
-                    const dateStr = detectionDate.toLocaleDateString("th-TH", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    });
-
-                    const timeStr = detectionDate.toLocaleTimeString("th-TH", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    });
-
-                    const statusColor =
-                      userHis.status === "Non-Alert" ? "text-green-600" : "text-red-500";
-
                     return (
                       <tr className="hover:bg-gray-50" key={index}>
                         <td className="text-center py-4 border-b">{startIndex + index + 1}</td>
-                        <td className="px-4 py-2 border-b text-center">{dateStr}</td>
-                        <td className="px-4 py-2 border-b text-center">{timeStr}</td>
-                        <td className="px-4 py-4 text-center">
+                        <td className="px-4 py-2 border-b text-center">{userHis.microsleeps}</td>
+                        <td className="px-4 py-2 border-b text-center">{userHis.yawn_duration}</td>
+                        <td className="px-4 py-4 border-b text-center">
                           <span
                             className={`inline-block px-3 py-1 text-sm font-medium rounded-full
-                ${userHis.status === "Alert"
+                          ${userHis.status === "Alert"
                                 ? "text-red-700 bg-red-100"
                                 : "text-green-700 bg-green-100"
                               }`}
@@ -167,13 +157,21 @@ const System = () => {
                             {userHis.status === "Alert" ? `แจ้งเตือน` : `ไม่มีการแจ้งเตือน`}
                           </span>
                         </td>
+                        <td className="px-4 py-2 border-b text-center">{formatDate(userHis.detection_time)}</td>
+                        <td className="px-4 py-2 border-b text-center">
+                          <Link
+                            to={`/system/${userHis?.detection_id}`}
+                            className="inline-block p-2 bg-blue-400 hover:bg-blue-500 text-white rounded-lg transition"
+                          >
+                            <FaEye size={18} />
+                          </Link>
+                        </td>
                       </tr>
                     );
                   })
                 )}
             </tbody>
           </table>
-
           <Pagination
             currentPage={userHistory?.currentPage}
             totalPages={userHistory?.totalPage}

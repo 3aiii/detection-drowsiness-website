@@ -21,6 +21,7 @@ app.use(
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server is running on port ${process.env.SERVER_PORT}`);
+  console.log(`CORS is running on port ${process.env.VITE_APP}`);
 });
 
 app.use("/api", indexRouter);

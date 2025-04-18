@@ -45,7 +45,8 @@ const Sidebar = ({ role }) => {
       <Link
         to="/system"
         className={`flex items-center gap-3 px-4 py-2 rounded-md text-lg font-medium transition-all duration-200
-          ${isActivated("/system")
+          ${isActivated("/system") ||
+            matchPath("/system/:id", location.pathname)
             ? "bg-[#1296BF] text-white"
             : "text-gray-700 hover:bg-gray-100 hover:text-[#1296BF]"
           }`}

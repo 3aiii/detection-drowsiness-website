@@ -21,7 +21,6 @@ const Login = () => {
     e.preventDefault();
 
     const data = await login(credentials);
-
     if (data.status === 200) {
       if (data.data.token) {
         showAlert(
