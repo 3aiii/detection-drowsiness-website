@@ -10,18 +10,32 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const offset = (page - 1) * limit;
-
+    const search = req.query.search || '';
+  
     try {
-      const [countHistory] = await connector.execute(`
-        SELECT 
-          COUNT(*) as total
-        FROM detection_tbl d
-      `);
-
+      const searchQuery = `
+        WHERE 
+          u.firstname LIKE ? OR 
+          u.lastname LIKE ? OR 
+          u.username LIKE ?
+      `;
+  
+      const searchValues = [`%${search}%`, `%${search}%`, `%${search}%`];
+  
+      const [countHistory] = await connector.execute(
+        `
+          SELECT COUNT(*) AS total
+          FROM detection_tbl d
+          JOIN user_tbl u ON d.user_id = u.user_id
+          ${search ? searchQuery : ''}
+        `,
+        search ? searchValues : []
+      );
+  
       const totalPage = Math.ceil(countHistory[0].total / limit);
-
+  
       const [history] = await connector.execute(
-        `      
+        `
           SELECT 
             d.*, 
             u.firstname AS fname, 
@@ -29,23 +43,24 @@ module.exports = {
             u.email AS email
           FROM detection_tbl d
           JOIN user_tbl u ON d.user_id = u.user_id
+          ${search ? searchQuery : ''}
           ORDER BY d.detection_time DESC
           LIMIT ? OFFSET ?
-      `,
-        [limit, offset]
+        `,
+        search ? [...searchValues, limit, offset] : [limit, offset]
       );
-
+  
       if (history.length === 0) {
         return res.send({ message: "Can't find history" });
       }
-
+  
       return res.status(200).send({
         data: history,
         currentPage: page,
         totalPage: totalPage,
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.send({ error: error.message });
     }
   },

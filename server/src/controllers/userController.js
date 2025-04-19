@@ -67,7 +67,7 @@ module.exports = {
       email,
       role = "user",
     } = req.body;
-    
+
     if (!username || !password || !firstname || !lastname || !email) {
       return res.send({
         message: "Please, fill your data",
@@ -217,7 +217,7 @@ module.exports = {
   },
   changeSound: async (req, res) => {
     const { sound } = req.body
-    const   userId = req.params.id
+    const userId = req.params.id
 
     try {
       const [userData] = await connector.execute(`SELECT * FROM user_tbl WHERE user_id = ?`, [userId])

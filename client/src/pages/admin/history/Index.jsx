@@ -4,33 +4,46 @@ import Pagination from "../../../components/Pagination";
 import { FaEye } from "react-icons/fa6";
 import { fetchs } from "../../../apis/systemApi";
 import { formatDate } from "../../../utils/sweetProp";
+import { IoSearchOutline } from "react-icons/io5";
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [search, setSearch] = useState('')
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [history, setHistory] = useState([])
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const { data } = await fetchs(currentPage, itemsPerPage)
+      const { data } = await fetchs(currentPage, itemsPerPage, search)
 
       setHistory(data)
     }
 
     fetchHistory()
-  }, [currentPage])
+  }, [currentPage, search])
 
   return (
     <div className="px-6 py-8 mx-auto">
-      <div>
-        <h1 className="text-3xl font-semibold text-[#1296BF] mb-1">
-          ประวัติการใช้งาน
-        </h1>
-        <p className="text-gray-600">
-          ดูประวัติการใช้งานของผู้ใช้งานระบบตรวจจับการหลับใน
-        </p>
+      <div className="flex justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-[#1296BF] mb-1">
+            ประวัติการใช้งาน
+          </h1>
+          <p className="text-gray-600">
+            ดูประวัติการใช้งานของผู้ใช้งานระบบตรวจจับการหลับใน
+          </p>
+        </div>
+        <div className="relative flex items-center gap-4">
+          <IoSearchOutline className="absolute left-2 top-6 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="กรุณาพิมพ์คำค้นหา..."
+            className="px-3 pl-8 py-2 mt-1 focus:ring-[#1296BF] 
+              focus:ring-2 bg-[#edf0f5] rounded-lg font-light focus:outline-none w-[300px]"
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
       <div>
         <div className="mt-6 bg-white rounded-xl border overflow-x-auto">

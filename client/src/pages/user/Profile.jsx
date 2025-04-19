@@ -59,11 +59,15 @@ const Profile = () => {
           await profile(formData.profile_image, userId);
         }
 
-        showAlert("Success", "Data updated successfully.", "success").then(
-          () => {
-            window.location.reload();
-          }
-        );
+        if (data?.message === 'Your username or email already has in database') {
+          showAlert("Warning", `${data?.message}`, 'warning')
+        } else {
+          showAlert("Success", "Data updated successfully.", "success").then(
+            () => {
+              window.location.reload();
+            }
+          );
+        }
       }
     } catch (error) {
       showAlert("Error", `${error.message}`, "error");
